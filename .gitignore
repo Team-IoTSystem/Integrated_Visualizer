@@ -1,0 +1,7 @@
+### project files
+.idea
+assets/sass
+
+### node.js
+node_modules
+package-lock.json
