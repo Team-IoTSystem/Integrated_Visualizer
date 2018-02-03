@@ -17,6 +17,12 @@ def select_latest(conn, cur, dev_mac, rpimac):
                    """, (dev_mac, rpimac[0], rpimac[1]))
     conn.commit()
     data = cur.fetchone()
-    print("DB:{}, pwr:{}".format(data["id"], data["pwr"]))
+    #print("DB:{}, pwr:{}".format(data["id"], data["pwr"]))
     return data
+
+
+def select_all(conn, cur, dev_mac, rpimac):
+    cur.execute("""SELECT * FROM distance WHERE macaddr=%s AND rpimac=%s""", (dev_mac, rpimac))
+    conn.commit()
+    return cur.fetchone()
 
