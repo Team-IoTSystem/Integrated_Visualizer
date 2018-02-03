@@ -11,7 +11,7 @@ import mpld3
 # 各RPIの座標
 rpi_a_coor = [0, 0]
 rpi_b_coor = [0, 5]
-rpi_c_coor = [3.5, 5 / 2]
+rpi_c_coor = [3.5, 2.5]
 
 # ヒートマップ表示範囲[m]
 map_range = 5
@@ -101,79 +101,74 @@ class Device:
             sum_r += item[2]
         return sum_x / self.CIRCLE_DATA_SIZE, sum_y / self.CIRCLE_DATA_SIZE, sum_r / self.CIRCLE_DATA_SIZE
 
-    def make_heatmap(self, circle_list):
-        squares = 40
-        weight = 10
-        dot_per_meter = int(squares / map_range)
-        map_ary = [[0]*squares for s in range(squares)]
-        for i, circle in enumerate(circle_list):
-            circle_squ = [int(p * dot_per_meter) for p in circle]
-            y_min = circle_squ[1] - circle_squ[2]
-            y_max = circle_squ[1] + circle_squ[2]
-            for y in range(squares):
-                if y_min < y < y_max:
-                    for x in range(squares):
-                        if (x-circle_squ[0])**2 + (y-circle_squ[1])**2 < circle_squ[2]**2:
-                            map_ary[x][y] += weight
-        return map_ary
-
     def make_histogram(self, circle_list):
         # ドットの数
         squares = 5
         dot_per_meter = int(squares / map_range)
         x_ary = []
         y_ary = []
+        min_r = 100
         for i, circle in enumerate(circle_list):
-            circle_squ = [p*dot_per_meter for p in circle]
+            circle_squ = [p * dot_per_meter for p in circle]
             for x_squ, y_squ in product(range(squares), range(squares)):
-                if (x_squ-circle_squ[0])**2 + (y_squ-circle_squ[1])**2 <= circle_squ[2]**2:
+                r = (x_squ - circle_squ[0]) ** 2 + (y_squ - circle_squ[1]) ** 2
+                if r <= circle_squ[2] ** 2:
                     x_ary.append(x_squ / dot_per_meter)
                     y_ary.append(y_squ / dot_per_meter)
+                if r < min_r:
+                    x_min = x_squ
+                    y_min = y_squ
+                    min_r = r
+        if not x_ary or not y_ary:
+            x_ary.append(x_min)
+            y_ary.append(y_min)
         return x_ary, y_ary
 
 
 def main(argv):
-    debug = True
+    debug = False
     map_margin = 1
     devlist = []
-    for macaddr in argv[1:]:
-        dev = Device(macaddr)
-        devlist.append(dev)
-        if debug:
-            dev.macaddr = "84:89:AD:8D:85:F6"
-            dev.hostname = "iPhone"
+    if debug:
+        dev = Device("30:AE:A4:03:8A:44")
+        dev.devname = "ESP"
+    else:
+        for i, macaddr in enumerate(argv[1:]):
+            dev = Device(macaddr)
+            dev.devname = "Device_{}".format(i+1)
+            devlist.append(dev)
+
 
     conn, cur = dbcontroller.mysql_connect(host, user, passwd, db)
     try:
-        while True:
-            for dev in devlist:
-                dev.put_data_a(dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_a_mac))
-                dev.put_data_b(dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_b_mac))
-                dev.put_data_c(dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_c_mac))
+        for dev in devlist:
+            data_a = dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_a_mac)
+            data_b = dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_b_mac)
+            data_c = dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_c_mac)
+            if (data_a and data_b and data_c) == None:
+                continue
+            dev.put_data_a(data_a)
+            dev.put_data_b(data_b)
+            dev.put_data_c(data_c)
 
-                print("#a:{}  #b{}  #c{}".format(dev.get_moving_average_of_dist(dev.data_a_list), dev.get_moving_average_of_dist(dev.data_b_list), dev.get_moving_average_of_dist(dev.data_c_list), ))
-                # n点で移動平均をとった距離データを元に3辺測位をする
-                dev.coordinate = trilateration(
-                    dev.get_moving_average_of_dist(dev.data_a_list),
-                    dev.get_moving_average_of_dist(dev.data_b_list),
-                    dev.get_moving_average_of_dist(dev.data_c_list),
-                )
-                dev.put_range_circle(dev.coordinate)
-                x, y = dev.make_histogram(dev.range_circle_list)
-                plt.clf()
-                plt.ion()
-                plt.hist2d(x, y, bins=map_range+map_margin*2, range=[[0-map_margin, map_range+map_margin], [0-map_margin, map_range+map_margin]])
-                xcoord = float(dev.get_moving_average_of_circle(dev.range_circle_list)[0])
-                ycoord = float(dev.get_moving_average_of_circle(dev.range_circle_list)[1])
-                plt.text(xcoord, ycoord, dev.hostname, fontsize=15, color="white")
-            plt.colorbar()
-            plt.scatter([rpi_a_coor[0], rpi_b_coor[0], rpi_c_coor[0]], [rpi_a_coor[1], rpi_b_coor[1], rpi_c_coor[1]], s=50, c='red')
-            plt.axes().set_aspect('equal', 'datalim')
-            plt.savefig("position.png")
-            with open('heatmap.html', 'w') as fout:
-                fout.write(mpld3.fig_to_html(plt.gcf()))
-                # TODO DBに送信
-            plt.pause(5)
+            print("#a:{}  #b{}  #c{}".format(dev.get_moving_average_of_dist(dev.data_a_list), dev.get_moving_average_of_dist(dev.data_b_list), dev.get_moving_average_of_dist(dev.data_c_list), ))
+            # n点で移動平均をとった距離データを元に3辺測位をする
+            dev.coordinate = trilateration(
+                dev.get_moving_average_of_dist(dev.data_a_list),
+                dev.get_moving_average_of_dist(dev.data_b_list),
+                dev.get_moving_average_of_dist(dev.data_c_list),
+            )
+            dev.put_range_circle(dev.coordinate)
+            x, y = dev.make_histogram(dev.range_circle_list)
+            plt.ion()
+            plt.hist2d(x, y, bins=map_range+map_margin*2, range=[[0-map_margin, map_range+map_margin], [0-map_margin, map_range+map_margin]])
+            xcoord = float(dev.get_moving_average_of_circle(dev.range_circle_list)[0])
+            ycoord = float(dev.get_moving_average_of_circle(dev.range_circle_list)[1])
+            plt.text(xcoord, ycoord, dev.devname, fontsize=20, color="white")
+        plt.colorbar()
+        plt.scatter([rpi_a_coor[0], rpi_b_coor[0], rpi_c_coor[0]], [rpi_a_coor[1], rpi_b_coor[1], rpi_c_coor[1]], s=50, c='red')
+        plt.axes().set_aspect('equal', 'datalim')
+        return mpld3.fig_to_html(plt.gcf())
 
     except KeyboardInterrupt:
         plt.close()
