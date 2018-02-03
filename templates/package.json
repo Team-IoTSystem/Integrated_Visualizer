@@ -1,0 +1,29 @@
+{
+  "name": "dashboard",
+  "version": "1.0.0",
+  "description": "test",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Team-IoTSystem/Visualize2D.git"
+  },
+  "author": "takuzoo3868",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Team-IoTSystem/Visualize2D/issues"
+  },
+  "homepage": "https://github.com/Team-IoTSystem/Visualize2D#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "webpack": "^3.10.0"
+  },
+  "dependencies": {
+    "d3": "^4.12.0"
+  }
+}
