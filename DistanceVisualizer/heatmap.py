@@ -138,7 +138,6 @@ def main(argv):
             dev.devname = "Device_{}".format(i+1)
             devlist.append(dev)
 
-
     conn, cur = dbcontroller.mysql_connect(host, user, passwd, db)
     try:
         for dev in devlist:
@@ -160,12 +159,10 @@ def main(argv):
             )
             dev.put_range_circle(dev.coordinate)
             x, y = dev.make_histogram(dev.range_circle_list)
-            plt.ion()
             plt.hist2d(x, y, bins=map_range+map_margin*2, range=[[0-map_margin, map_range+map_margin], [0-map_margin, map_range+map_margin]])
             xcoord = float(dev.get_moving_average_of_circle(dev.range_circle_list)[0])
             ycoord = float(dev.get_moving_average_of_circle(dev.range_circle_list)[1])
             plt.text(xcoord, ycoord, dev.devname, fontsize=20, color="white")
-        plt.colorbar()
         plt.scatter([rpi_a_coor[0], rpi_b_coor[0], rpi_c_coor[0]], [rpi_a_coor[1], rpi_b_coor[1], rpi_c_coor[1]], s=50, c='red')
         plt.axes().set_aspect('equal', 'datalim')
         return mpld3.fig_to_html(plt.gcf())
