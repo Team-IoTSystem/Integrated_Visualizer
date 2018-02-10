@@ -43,8 +43,8 @@ def trilateration(a_dist, b_dist, c_dist):
 
 
 class Device:
-    PI_DATA_SIZE = 5
-    CIRCLE_DATA_SIZE = 5
+    PI_DATA_SIZE = 3
+    CIRCLE_DATA_SIZE = 3
 
     def __init__(self, macaddr):
         self.macaddr = macaddr
@@ -115,6 +115,9 @@ class Device:
                 if r <= circle_squ[2] ** 2:
                     x_ary.append(x_squ / dot_per_meter)
                     y_ary.append(y_squ / dot_per_meter)
+                if r <= circle_squ[2] / 2:
+                    x_ary.append(x_squ / dot_per_meter)
+                    y_ary.append(y_squ / dot_per_meter)
                 if r < min_r:
                     x_min = x_squ
                     y_min = y_squ
@@ -124,22 +127,18 @@ class Device:
             y_ary.append(y_min)
         return x_ary, y_ary
 
+devlist = []
+for i, macaddr in enumerate(("30:AE:A4:03:8A:44",)):
+    dev = Device(macaddr)
+    dev.devname = "Device_{}".format(i + 1)
+    devlist.append(dev)
 
-def main(argv):
-    debug = False
+def main():
     map_margin = 1
-    devlist = []
-    if debug:
-        dev = Device("30:AE:A4:03:8A:44")
-        dev.devname = "ESP"
-    else:
-        for i, macaddr in enumerate(argv):
-            dev = Device(macaddr)
-            dev.devname = "Device_{}".format(i+1)
-            devlist.append(dev)
-
+    global devlist
     conn, cur = dbcontroller.mysql_connect(host, user, passwd, db)
     try:
+        plt.clf()
         for dev in devlist:
             data_a = dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_a_mac)
             data_b = dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_b_mac)
@@ -162,8 +161,12 @@ def main(argv):
             plt.hist2d(x, y, bins=map_range+map_margin*2, range=[[0-map_margin, map_range+map_margin], [0-map_margin, map_range+map_margin]])
             xcoord = float(dev.get_moving_average_of_circle(dev.range_circle_list)[0])
             ycoord = float(dev.get_moving_average_of_circle(dev.range_circle_list)[1])
-            plt.text(xcoord, ycoord, dev.devname, fontsize=20, color="white")
+            plt.text(xcoord, ycoord, dev.devname, fontsize=20, color="white", weight='bold')
         plt.scatter([rpi_a_coor[0], rpi_b_coor[0], rpi_c_coor[0]], [rpi_a_coor[1], rpi_b_coor[1], rpi_c_coor[1]], s=50, c='red')
+        rpi_text_mergin = 0.2
+        plt.text(rpi_a_coor[0]+rpi_text_mergin, rpi_a_coor[1]+rpi_text_mergin, "RPI_A", fontsize=15, color="red", weight='bold')
+        plt.text(rpi_b_coor[0]+rpi_text_mergin, rpi_b_coor[1]+rpi_text_mergin, "RPI_B", fontsize=15, color="red", weight='bold')
+        plt.text(rpi_c_coor[0]+rpi_text_mergin, rpi_c_coor[1]+rpi_text_mergin, "RPI_C", fontsize=15, color="red", weight='bold')
         plt.axes().set_aspect('equal', 'datalim')
         return mpld3.fig_to_html(plt.gcf())
 
@@ -173,4 +176,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()
