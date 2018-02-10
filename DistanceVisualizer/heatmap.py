@@ -1,12 +1,12 @@
-from matplotlib import pyplot as plt
-import numpy as np
-import sympy as sym
-from itertools import product
-import dbcontroller
-from certification_data import *
 import sys
-import mpld3
 
+import mpld3
+import sympy as sym
+from matplotlib import pyplot as plt
+
+import DistanceVisualizer.dbcontroller as dbcontroller
+from DistanceVisualizer.certification_data import *
+from itertools import product
 
 # 各RPIの座標
 rpi_a_coor = [0, 0]
@@ -133,7 +133,7 @@ def main(argv):
         dev = Device("30:AE:A4:03:8A:44")
         dev.devname = "ESP"
     else:
-        for i, macaddr in enumerate(argv[1:]):
+        for i, macaddr in enumerate(argv):
             dev = Device(macaddr)
             dev.devname = "Device_{}".format(i+1)
             devlist.append(dev)
@@ -176,5 +176,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    main(sys.argv)
-
+    main(sys.argv[1:])
