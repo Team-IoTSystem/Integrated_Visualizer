@@ -1,4 +1,4 @@
-import sys
+from itertools import product
 
 import mpld3
 import sympy as sym
@@ -6,24 +6,6 @@ from matplotlib import pyplot as plt
 
 import DistanceVisualizer.dbcontroller as dbcontroller
 from DistanceVisualizer.certification_data import *
-from itertools import product
-
-# 各RPIの座標
-rpi_a_coor = [0, 0]
-rpi_b_coor = [0, 5]
-rpi_c_coor = [3.5, 2.5]
-
-# ヒートマップ表示範囲[m]
-map_range = 5
-
-# 各RPIのmacaddr
-rpi_a_mac = "3476c58b5506", "b827ebe98ea9"
-rpi_b_mac = "b827ebf277a4", "3476c58b5522"
-rpi_c_mac = "b827ebb63034", "106f3f59c177"
-
-
-# # ダミーデータ
-# data_a = {"id": 6, "macaddr": "AA:BB:CC:DD:EE", "pwr": -42, "distance": 2, "rpimac": "rpi_a"}
 
 
 def trilateration(a_dist, b_dist, c_dist):
@@ -46,8 +28,9 @@ class Device:
     PI_DATA_SIZE = 3
     CIRCLE_DATA_SIZE = 3
 
-    def __init__(self, macaddr):
+    def __init__(self, macaddr, devname):
         self.macaddr = macaddr
+        self.devname = devname
         self.data_a_list = []
         self.data_b_list = []
         self.data_c_list = []
@@ -127,11 +110,6 @@ class Device:
             y_ary.append(y_min)
         return x_ary, y_ary
 
-devlist = []
-for i, macaddr in enumerate(("30:AE:A4:03:8A:44",)):
-    dev = Device(macaddr)
-    dev.devname = "Device_{}".format(i + 1)
-    devlist.append(dev)
 
 def main():
     map_margin = 1
@@ -143,7 +121,7 @@ def main():
             data_a = dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_a_mac)
             data_b = dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_b_mac)
             data_c = dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_c_mac)
-            if (data_a and data_b and data_c) == None:
+            if (data_a and data_b and data_c) is None:
                 continue
             dev.put_data_a(data_a)
             dev.put_data_b(data_b)
@@ -162,11 +140,11 @@ def main():
             xcoord = float(dev.get_moving_average_of_circle(dev.range_circle_list)[0])
             ycoord = float(dev.get_moving_average_of_circle(dev.range_circle_list)[1])
             plt.text(xcoord, ycoord, dev.devname, fontsize=20, color="white", weight='bold')
-        plt.scatter([rpi_a_coor[0], rpi_b_coor[0], rpi_c_coor[0]], [rpi_a_coor[1], rpi_b_coor[1], rpi_c_coor[1]], s=50, c='red')
+        plt.scatter([rpi_a_coor[0], rpi_b_coor[0], rpi_c_coor[0]], [rpi_a_coor[1], rpi_b_coor[1], rpi_c_coor[1]], s=70, c='white')
         rpi_text_mergin = 0.2
-        plt.text(rpi_a_coor[0]+rpi_text_mergin, rpi_a_coor[1]+rpi_text_mergin, "RPI_A", fontsize=15, color="red", weight='bold')
-        plt.text(rpi_b_coor[0]+rpi_text_mergin, rpi_b_coor[1]+rpi_text_mergin, "RPI_B", fontsize=15, color="red", weight='bold')
-        plt.text(rpi_c_coor[0]+rpi_text_mergin, rpi_c_coor[1]+rpi_text_mergin, "RPI_C", fontsize=15, color="red", weight='bold')
+        plt.text(rpi_a_coor[0]+rpi_text_mergin, rpi_a_coor[1]+rpi_text_mergin, "RPI_A", fontsize=25, color="white", weight='heavy')
+        plt.text(rpi_b_coor[0]+rpi_text_mergin, rpi_b_coor[1]+rpi_text_mergin, "RPI_B", fontsize=25, color="white", weight='heavy')
+        plt.text(rpi_c_coor[0]+rpi_text_mergin, rpi_c_coor[1]+rpi_text_mergin, "RPI_C", fontsize=25, color="white", weight='heavy')
         plt.axes().set_aspect('equal', 'datalim')
         return mpld3.fig_to_html(plt.gcf())
 
@@ -174,6 +152,28 @@ def main():
         plt.close()
         conn.close()
 
+# 各RPIの座標
+rpi_a_coor = [0, 0]
+rpi_b_coor = [0, 5]
+rpi_c_coor = [3.5, 2.5]
+
+# ヒートマップ表示範囲[m]
+map_range = 5
+
+# 各RPIのmacaddr
+rpi_a_mac = "3476c58b5506", "b827ebe98ea9"
+rpi_b_mac = "b827ebf277a4", "3476c58b5522"
+rpi_c_mac = "b827ebb63034", "106f3f59c177"
+
+
+# # ダミーデータ
+# data_a = {"id": 6, "macaddr": "AA:BB:CC:DD:EE", "pwr": -42, "distance": 2, "rpimac": "rpi_a"}
+
+devlist = []
+macaddresses = ("30:AE:A4:03:8A:44",)
+
+for i, macaddr in enumerate(macaddresses):
+    devlist.append(Device(macaddr, "Device_{}".format(i + 1)))
 
 if __name__ == "__main__":
     main()
