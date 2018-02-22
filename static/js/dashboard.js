@@ -35,21 +35,9 @@ CHART_COLORS = ['#0770a2', '#ff6900', '#aec844', '#d0dd9e',
     '#f8b586', '#82b6cf', '#a9a9a9', '#5a5a5a'];
 
 
-/**
- * dashboard Module
- * All of the JavaScript specific to the dashboard is contained inside this
- * angular module.  The only external dependencies are:
- * - beaver and cormorant (Active)
- * - angular-chart (jtblin)
- * - ui-bootstrap (Google)
- */
 angular.module('dashboard', ['chart.js', 'ui.bootstrap', 'reelyactive.beaver',
     'reelyactive.cormorant'])
 
-/**
- * DashCtrl Controller
- * Handles the manipulation of all variables accessed by the HTML view.
- */
     .controller('DashCtrl', function ($scope, $interval, beaver, cormorant) {
 
         // Variables accessible in the HTML scope
