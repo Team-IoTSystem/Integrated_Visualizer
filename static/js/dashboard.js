@@ -1,4 +1,5 @@
-// Constant definitions
+// デモ用ダミーデータ取得サーバ
+// 描画用設定
 API_ROOT = 'https://www.hyperlocalcontext.com/';
 DEFAULT_SOCKET_URL = API_ROOT;
 WHEREIS_TRANSMITTER_ROOT = API_ROOT + '/whereis/transmitter/';
@@ -31,10 +32,10 @@ BAR_CHART_LABELS = ['Max RSSI', 'Avg RSSI', 'Min RSSI'];
 BAR_CHART_OPTIONS = {};
 DOUGHNUT_CHART_SAMPLES = 8;
 DOUGHNUT_CHART_OPTIONS = {};
-CHART_COLORS = ['#0770a2', '#ff6900', '#aec844', '#d0dd9e',
-    '#f8b586', '#82b6cf', '#a9a9a9', '#5a5a5a'];
+CHART_COLORS = ['#00bcd4', '#4caf50', '#ff9800', '#f44336',
+    '#e91e63', '#82b6cf', '#a9a9a9', '#5a5a5a'];
 
-
+// Angularモジュール設定
 angular.module('dashboard', ['chart.js', 'ui.bootstrap', 'reelyactive.beaver',
     'reelyactive.cormorant'])
 
@@ -305,6 +306,7 @@ angular.module('dashboard', ['chart.js', 'ui.bootstrap', 'reelyactive.beaver',
         $scope.updatePeriod(DEFAULT_UPDATE_MILLISECONDS);
     });
 
+// 画面処理
 (function () {
     isWindows = navigator.platform.indexOf('Win') > -1 ? true : false;
 
@@ -395,10 +397,9 @@ $(document).on('click', '.navbar-toggle', function () {
     }
 });
 
-// activate collapse right menu when the windows is resized
+// リサイズ時の画面処理
 $(window).resize(function () {
     md.initSidebarsCheck();
-    // reset the seq for charts drawing animations
     seq = seq2 = 0;
 });
 
