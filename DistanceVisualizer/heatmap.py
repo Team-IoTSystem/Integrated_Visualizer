@@ -6,9 +6,12 @@ from matplotlib import pyplot as plt
 
 import DistanceVisualizer.dbcontroller as dbcontroller
 from DistanceVisualizer.certification_data import *
+import json
+import requests
+import logging
 
 
-def trilateration(a_dist, b_dist, c_dist):
+def get_tangential_circle(a_dist, b_dist, c_dist):
     """各RPIを中心、デバイスまでの距離を半径とした3つの円を考え、それら3円に接する最も半径の小さい円の中心座標と半径を返す"""
     x, y, R = sym.symbols('x,y,R', real=True)
     sign = [-1, 1]
@@ -22,6 +25,12 @@ def trilateration(a_dist, b_dist, c_dist):
                 minans = ans
     print("R:{}".format(minans[2]))
     return minans[0], minans[1], minans[2]
+
+
+def post_data(data, server_ip, endpoint):
+    dist = "http://" + server_ip + endpoint
+    headertype = {"Content-Type": "application/json"}
+    requests.post(dist, json.dumps(data), headers=headertype)
 
 
 class Device:
@@ -112,6 +121,7 @@ class Device:
 
 
 def main():
+    logging.basicConfig(level=logging.DEBUG)
     map_margin = 1
     global devlist
     conn, cur = dbcontroller.mysql_connect(host, user, passwd, db)
@@ -127,9 +137,12 @@ def main():
             dev.put_data_b(data_b)
             dev.put_data_c(data_c)
 
-            print("#a:{}  #b{}  #c{}".format(dev.get_moving_average_of_dist(dev.data_a_list), dev.get_moving_average_of_dist(dev.data_b_list), dev.get_moving_average_of_dist(dev.data_c_list), ))
+            logging.info("#a:%s  #b:%s  #c:%s",
+                         dev.get_moving_average_of_dist(dev.data_a_list),
+                         dev.get_moving_average_of_dist(dev.data_b_list),
+                         dev.get_moving_average_of_dist(dev.data_c_list))
             # n点で移動平均をとった距離データを元に3辺測位をする
-            dev.coordinate = trilateration(
+            dev.coordinate = get_tangential_circle(
                 dev.get_moving_average_of_dist(dev.data_a_list),
                 dev.get_moving_average_of_dist(dev.data_b_list),
                 dev.get_moving_average_of_dist(dev.data_c_list),
