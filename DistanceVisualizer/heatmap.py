@@ -23,7 +23,6 @@ def get_tangential_circle(a_dist, b_dist, c_dist):
         for ans in result:
             if 0 < ans[2] < minans[2]:
                 minans = ans
-    print("R:{}".format(minans[2]))
     return minans[0], minans[1], minans[2]
 
 
@@ -45,29 +44,10 @@ class Device:
         self.data_c_list = []
         self.range_circle_list = []
 
-    def put_data_a(self, devdata):
-        if len(self.data_a_list) == self.PI_DATA_SIZE:
-            temp = self.data_a_list[1:]
-            temp.append(devdata)
-            self.data_a_list = temp
-        else:
-            self.data_a_list.append(devdata)
-
-    def put_data_b(self, devdata):
-        if len(self.data_b_list) == self.PI_DATA_SIZE:
-            temp = self.data_b_list[1:]
-            temp.append(devdata)
-            self.data_b_list = temp
-        else:
-            self.data_b_list.append(devdata)
-
-    def put_data_c(self, devdata):
-        if len(self.data_c_list) == self.PI_DATA_SIZE:
-            temp = self.data_c_list[1:]
-            temp.append(devdata)
-            self.data_c_list = temp
-        else:
-            self.data_c_list.append(devdata)
+    def push_data(self, dev_data, data_list):
+        if len(data_list) == self.PI_DATA_SIZE:
+            del data_list[0]
+        data_list.append(dev_data)
 
     def put_range_circle(self, circle_data):
         if len(self.range_circle_list) == self.CIRCLE_DATA_SIZE:
@@ -121,7 +101,7 @@ class Device:
 
 
 def main():
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     map_margin = 1
     global devlist
     conn, cur = dbcontroller.mysql_connect(host, user, passwd, db)
@@ -133,10 +113,11 @@ def main():
             data_c = dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_c_mac)
             if (data_a and data_b and data_c) is None:
                 continue
-            dev.put_data_a(data_a)
-            dev.put_data_b(data_b)
-            dev.put_data_c(data_c)
 
+            dev.push_data(data_a, dev.data_a_list)
+            dev.push_data(data_b, dev.data_b_list)
+            dev.push_data(data_c, dev.data_c_list)
+            logging.debug("data_a_list:%s", dev.data_a_list[0]['id'])
             logging.info("#a:%s  #b:%s  #c:%s",
                          dev.get_moving_average_of_dist(dev.data_a_list),
                          dev.get_moving_average_of_dist(dev.data_b_list),
