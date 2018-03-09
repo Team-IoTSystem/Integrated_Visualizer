@@ -26,10 +26,10 @@ def get_tangential_circle(a_dist, b_dist, c_dist):
     return minans[0], minans[1], minans[2]
 
 
-def post_data(data, server_ip, endpoint):
-    dist = "http://" + server_ip + endpoint
-    headertype = {"Content-Type": "application/json"}
-    requests.post(dist, json.dumps(data), headers=headertype)
+def get_latest_data(server_host, endpoint, dev_macaddr, rpi_macaddr):
+    dist = "http://" + server_host + endpoint
+    payload = {"macaddress": dev_macaddr, "rpi_macaddress": rpi_macaddr, "new_order_one": 1}
+    return requests.get(dist, params=payload)
 
 
 class Device:
@@ -60,7 +60,7 @@ class Device:
     def get_moving_average_of_dist(self, data_list):
         sum = 0
         for item in data_list:
-            sum += item["distance"]
+            sum += item["Dist"]
         return sum / self.PI_DATA_SIZE
 
     def get_moving_average_of_circle(self, data_list):
@@ -101,22 +101,30 @@ class Device:
 
 
 def main():
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
     map_margin = 1
-    conn, cur = dbcontroller.mysql_connect(host, user, passwd, db)
+    server_host = "localhost:3000"
+    endpoint = "/api/distance/macaddress"
+    if do_use_inner_mysql:
+        conn, cur = dbcontroller.mysql_connect(host, user, passwd, db)
     try:
         plt.clf()
         for dev in devlist:
-            data_a = dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_a_mac)
-            data_b = dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_b_mac)
-            data_c = dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_c_mac)
+            if do_use_inner_mysql:
+                data_a = dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_a_mac)
+                data_b = dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_b_mac)
+                data_c = dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_c_mac)
+            else:
+                data_a = get_latest_data(server_host, endpoint, dev.macaddr, rpi_a_mac).json()[0]
+                data_b = get_latest_data(server_host, endpoint, dev.macaddr, rpi_b_mac).json()[0]
+                data_c = get_latest_data(server_host, endpoint, dev.macaddr, rpi_c_mac).json()[0]
             if (data_a and data_b and data_c) is None:
                 continue
 
             dev.push_data(data_a, dev.data_a_list)
             dev.push_data(data_b, dev.data_b_list)
             dev.push_data(data_c, dev.data_c_list)
-            logging.debug("data_a_list:%s", dev.data_a_list[0]['id'])
+            logging.debug("data_a_list:%s", dev.data_a_list[0])
             logging.info("#a:%s  #b:%s  #c:%s",
                          dev.get_moving_average_of_dist(dev.data_a_list),
                          dev.get_moving_average_of_dist(dev.data_b_list),
@@ -154,7 +162,7 @@ rpi_c_coor = [3.5, 2.5]
 map_range = 5
 
 # 各RPIのmacaddr
-rpi_a_mac = "3476c58b5506", "b827ebe98ea9"
+rpi_a_mac = "b827ebe98ea9", "3476c58b5506"
 rpi_b_mac = "b827ebf277a4", "3476c58b5522"
 rpi_c_mac = "b827ebb63034", "106f3f59c177"
 
@@ -165,6 +173,9 @@ rpi_c_mac = "b827ebb63034", "106f3f59c177"
 devlist = []
 # テスト用デバイスのMACアドレス
 macaddresses = ("30:AE:A4:03:8A:44",)
+
+# mysqlを直接利用する
+do_use_inner_mysql = False
 
 for i, macaddr in enumerate(macaddresses):
     devlist.append(Device(macaddr, "Device_{}".format(i + 1)))
