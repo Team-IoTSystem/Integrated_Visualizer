@@ -9,6 +9,8 @@ from DistanceVisualizer.certification_data import *
 import json
 import requests
 import logging
+import urllib3
+import traceback
 
 
 def get_tangential_circle(a_dist, b_dist, c_dist):
@@ -115,9 +117,10 @@ def main():
                 data_b = dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_b_mac)
                 data_c = dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_c_mac)
             else:
-                data_a = get_latest_data(server_host, endpoint, dev.macaddr, rpi_a_mac).json()[0]
-                data_b = get_latest_data(server_host, endpoint, dev.macaddr, rpi_b_mac).json()[0]
-                data_c = get_latest_data(server_host, endpoint, dev.macaddr, rpi_c_mac).json()[0]
+                # TODO: dev.macaddrをタプルで渡す
+                data_a = get_latest_data(server_host, endpoint, dev.macaddr, rpi_a_mac[0]).json()[0]
+                data_b = get_latest_data(server_host, endpoint, dev.macaddr, rpi_b_mac[0]).json()[0]
+                data_c = get_latest_data(server_host, endpoint, dev.macaddr, rpi_c_mac[0]).json()[0]
             if (data_a and data_b and data_c) is None:
                 continue
 
@@ -152,6 +155,12 @@ def main():
     except KeyboardInterrupt:
         plt.close()
         conn.close()
+
+    except requests.exceptions.ConnectionError:
+        print(traceback.format_exc())
+        return None
+
+
 
 # 各RPIの座標
 rpi_a_coor = [0, 0]

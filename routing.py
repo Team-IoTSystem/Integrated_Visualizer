@@ -16,8 +16,10 @@ app.jinja_options = jinja_options
 
 @app.route('/')
 def show_dashboard():
-    d3map = Markup(main())
-    return render_template('index.html', heatmap=d3map)
+    d3map = main()
+    if d3map is None:
+        d3map = 'Heatmap is unavailable.'
+    return render_template('index.html', heatmap=Markup(d3map))
 
 if __name__ == '__main__':
     app.run()
