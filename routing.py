@@ -22,4 +22,4 @@ def show_dashboard():
     return render_template('index.html', heatmap=Markup(d3map))
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')
