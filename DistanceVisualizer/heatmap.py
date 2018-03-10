@@ -103,7 +103,7 @@ class Device:
 
 
 def main():
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     map_margin = 1
     server_host = "localhost:3000"
     endpoint = "/api/distance/macaddress"
