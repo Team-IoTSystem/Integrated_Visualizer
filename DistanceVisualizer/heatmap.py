@@ -1,8 +1,9 @@
 from itertools import product
-
+import matplotlib
+matplotlib.use('Agg')
 import mpld3
 import sympy as sym
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 
 import DistanceVisualizer.dbcontroller as dbcontroller
 from DistanceVisualizer.certification_data import *
