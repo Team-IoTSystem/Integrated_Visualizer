@@ -108,12 +108,22 @@ def main():
     map_margin = 1
     server_host = "localhost:3000"
     endpoint = "/api/distance/macaddress"
-    if do_use_inner_mysql:
+    # mysqlを直接利用する
+    do_use_local_mysql = False
+
+    devlist = []
+    # テスト用デバイスのMACアドレス
+    macaddresses = ("30:AE:A4:03:8A:44",)
+    for i, macaddr in enumerate(macaddresses):
+        devlist.append(Device(macaddr, "Device_{}".format(i + 1)))
+
+    if do_use_local_mysql:
         conn, cur = dbcontroller.mysql_connect(host, user, passwd, db)
+
     try:
         plt.clf()
         for dev in devlist:
-            if do_use_inner_mysql:
+            if do_use_local_mysql:
                 data_a = dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_a_mac)
                 data_b = dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_b_mac)
                 data_c = dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_c_mac)
@@ -179,16 +189,6 @@ rpi_c_mac = "b827ebb63034", "106f3f59c177"
 
 # # ダミーデータ
 # data_a = {"id": 6, "macaddr": "AA:BB:CC:DD:EE", "pwr": -42, "distance": 2, "rpimac": "rpi_a"}
-
-devlist = []
-# テスト用デバイスのMACアドレス
-macaddresses = ("30:AE:A4:03:8A:44",)
-
-# mysqlを直接利用する
-do_use_inner_mysql = False
-
-for i, macaddr in enumerate(macaddresses):
-    devlist.append(Device(macaddr, "Device_{}".format(i + 1)))
 
 if __name__ == "__main__":
     main()
