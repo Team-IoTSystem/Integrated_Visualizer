@@ -104,7 +104,7 @@ class Device:
 
 
 def main():
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
     map_margin = 1
     server_host = "localhost:3000"
     endpoint = "/api/distance/macaddress"
@@ -128,10 +128,9 @@ def main():
                 data_b = dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_b_mac)
                 data_c = dbcontroller.select_latest(conn, cur, dev.macaddr, rpi_c_mac)
             else:
-                # TODO: dev.macaddrをタプルで渡す
-                data_a = get_latest_data(server_host, endpoint, dev.macaddr, rpi_a_mac[0]).json()[0]
-                data_b = get_latest_data(server_host, endpoint, dev.macaddr, rpi_b_mac[0]).json()[0]
-                data_c = get_latest_data(server_host, endpoint, dev.macaddr, rpi_c_mac[0]).json()[0]
+                data_a = get_latest_data(server_host, endpoint, dev.macaddr, rpi_a_mac).json()[0]
+                data_b = get_latest_data(server_host, endpoint, dev.macaddr, rpi_b_mac).json()[0]
+                data_c = get_latest_data(server_host, endpoint, dev.macaddr, rpi_c_mac).json()[0]
             if (data_a and data_b and data_c) is None:
                 continue
 
@@ -139,6 +138,8 @@ def main():
             dev.push_data(data_b, dev.data_b_list)
             dev.push_data(data_c, dev.data_c_list)
             logging.debug("data_a_list:%s", dev.data_a_list[0])
+            logging.debug("data_b_list:%s", dev.data_b_list[0])
+            logging.debug("data_c_list:%s", dev.data_c_list[0])
             logging.info("#a:%s  #b:%s  #c:%s",
                          dev.get_moving_average_of_dist(dev.data_a_list),
                          dev.get_moving_average_of_dist(dev.data_b_list),
