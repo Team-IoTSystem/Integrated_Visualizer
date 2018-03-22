@@ -18,9 +18,11 @@ DEFAULT_WHITELIST_TAGS_FILTER = ['track'];
 DEFAULT_BLACKLIST_TAGS_FILTER = ['ignore'];
 
 
-angular.module('reelyactive.beaver', [])
+angular.module('beaver', [])
 
     .factory('beaver', function beaverFactory($http) {
+
+        var iots = {};
 
         var devices = {};
         var directories = {};
@@ -451,6 +453,9 @@ angular.module('reelyactive.beaver', [])
             on: setEventCallback,
             addDeviceProperty: addDeviceProperty,
             addDirectoryProperty: addDirectoryProperty,
+            getIoTs: function () {
+                return iots;
+            },
             getDevices: function () {
                 return devices;
             },

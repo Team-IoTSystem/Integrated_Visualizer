@@ -4,7 +4,7 @@
  * Licensed under MIT LICENSE.md
  */
 
-angular.module('reelyactive.cormorant', [])
+angular.module('cormorant', [])
 
     .factory('cormorant', function cormorantFactory($http) {
 
