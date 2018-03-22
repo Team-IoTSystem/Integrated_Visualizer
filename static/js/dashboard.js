@@ -59,8 +59,8 @@ var moduleSecHack = angular.module('vortoj', ['chart.js', 'ui.bootstrap', 'ngRes
 
 moduleSecHack.service('DashServ', function ($resource, $timeout, $q) {
     this.vortoj = function () {
-        //return $resource(RECENT_VORTOJ_URL).get().$promise;
-        return $resource(DEMO_GET_URL).get().$promise;
+        return $resource(RECENT_VORTOJ_URL).get().$promise;
+        //return $resource(DEMO_GET_URL).get().$promise;
         //return $resource(DEMO_Q_URL).query().$promise;
     };
 });
