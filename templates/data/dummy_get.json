@@ -1,0 +1,16 @@
+{
+  "ID": 1,
+  "DeviceID": "NOT_DEVICEID",
+  "SrcMAC": "34:76:c5:26:29:8a",
+  "DstMAC": "94:0e:6b:ae:2b:90",
+  "SrcIP": "151.101.72.133",
+  "DstIP": "192.168.0.2",
+  "SrcPort": "443(https)",
+  "DstPort": "33111",
+  "SYN": false,
+  "ACK": true,
+  "Sequence": 2411558269,
+  "Protocol": "TCP",
+  "Length": 83,
+  "DataChank": "FQMDABo1M7n0ra6I8PFK8Tft0bBU/wUV/l1bZATbHw=="
+}
