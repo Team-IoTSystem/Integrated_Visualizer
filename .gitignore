@@ -7,3 +7,4 @@ templates/package-lock.json
 TEST/
 templates/test.html
 templates/test.js
+templates/node_modules/
