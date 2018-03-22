@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Angular JSON Get Sample</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.4/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-resource/1.6.9/angular-resource.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/oui@7.0.33/oui.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/oui@7.0.33/oui.web.min.js"></script>
+
+    <script>
+        var oui = require('oui');
+        console.log(oui('20:37:06:12:34:56'));
+
+        var app = angular.module('myApp', ['ngResource']);
+        app.controller('MainController', ['$scope', '$resource', function ($scope, $resource) {
+            $scope.doSearch = function () {
+                //var contents = $resource("data/dummy.json");
+                var contents = $resource("http://localhost:3000/api");
+                // List  :一番外側が[]を取得 --> query()
+                // Object:一番外側が{}を取得 --> get()
+                $scope.items = contents.query();
+            };
+
+        }]);
+    </script>
+</head>
+
+<body ng-app="myApp">
+<div class="container" ng-controller="MainController">
+    <button class="btn btn-primary" ng-click="doSearch()">API TEST GET JSON</button>
+    <br>
+    <ul>
+        <li ng-repeat="data in items">{{data.ID}} - {{data.Protocol}}</li>
+    </ul>
+
+</div>
+</body>
+</html>

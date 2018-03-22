@@ -1,6 +1,9 @@
 ### project files
 .idea
 __pycache__/
+templates/package-lock.json
 
 ### project test
 TEST/
+templates/test.html
+templates/test.js
