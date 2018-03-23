@@ -45,7 +45,8 @@ class Device:
         self.data_c_queue = deque(maxlen=self.PI_DATA_SIZE)
         self.range_circle_queue = deque(maxlen=self.CIRCLE_DATA_SIZE)
 
-    def push_data(self, dev_data, data_queue):
+    @staticmethod
+    def push_data(dev_data, data_queue):
         data_queue.append(dev_data)
 
     def put_range_circle(self, circle_data):
@@ -67,7 +68,8 @@ class Device:
             sum_r += item[2]
         return sum_x / self.CIRCLE_DATA_SIZE, sum_y / self.CIRCLE_DATA_SIZE, sum_r / self.CIRCLE_DATA_SIZE
 
-    def make_histogram(self, circle_queue):
+    @staticmethod
+    def make_histogram(circle_queue):
         # ドットの数
         squares = 5
         dot_per_meter = int(squares / map_range)
