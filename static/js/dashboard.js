@@ -32,7 +32,7 @@ DEFAULT_BEAVER_OPTIONS = {
 
 /** Chart設定 */
 LINE_CHART_SAMPLES = 8;
-LINE_CHART_SERIES = ['デバイス', '不正通信'];
+LINE_CHART_SERIES = ['デバイス'];
 LINE_CHART_OPTIONS = {
     legend: {
         display: true,
@@ -59,8 +59,8 @@ var moduleSecHack = angular.module('vortoj', ['chart.js', 'ui.bootstrap', 'ngRes
 
 moduleSecHack.service('DashServ', function ($resource, $timeout, $q) {
     this.vortoj = function () {
-        return $resource(RECENT_VORTOJ_URL).get().$promise;
-        //return $resource(DEMO_GET_URL).get().$promise;
+        //return $resource(RECENT_VORTOJ_URL).get().$promise;
+        return $resource(DEMO_GET_URL).get().$promise;
         //return $resource(DEMO_Q_URL).query().$promise;
     };
 });
@@ -190,7 +190,7 @@ angular.module('dashboard', ['chart.js', 'ui.bootstrap', 'beaver', 'cormorant'])
         $scope.rssi = {};
         $scope.stories = [];
         $scope.linechart = {
-            labels: [], series: LINE_CHART_SERIES, data: [[], []],
+            labels: [], series: LINE_CHART_SERIES, data: [[]],
             options: LINE_CHART_OPTIONS
         };
         $scope.barchart = {labels: BAR_CHART_LABELS, data: [], options: {}};

@@ -93,7 +93,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="#"> 通信状況 </a>
+                    <a class="navbar-brand" href="#"> 機器情報 </a>
                 </div>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right">
@@ -185,7 +185,7 @@
                                     <td>
                                         <span class="btn btn-xs btn-block"
                                               ng-style="{'background-color': chartColors[d], 'color': 'white'}">
-                                                <b>{{ d.count }}</b>
+                                                <b>{{ d.ID }}</b>
                                         </span>
                                     </td>
                                     <td> {{ d.SrcMAC }}</td>
@@ -228,7 +228,7 @@
                         </thead>
                         <tbody>
                         <tr ng-repeat="d in vortoj() | limitTo: 3">
-                            <td> {{ d.DeviceID }} </td>
+                            <td> {{ d.DeviceID }}</td>
                             <td> {{ d.SYN }}</td>
                             <td> {{ d.Protocol }} </a></td>
                         </tr>
