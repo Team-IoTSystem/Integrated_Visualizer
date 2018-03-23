@@ -28,7 +28,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/push.js/0.0.11/push.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/oui@7.0.33/oui.web.min.js"></script>
 
-<body ng-app="vortoj">
+<body ng-app="dashboard">
 <!-- データ読み込み処理 -->
 <div id="loader-bg">
     <div id="loader">
@@ -181,14 +181,17 @@
                         <div class="col-md-6">
                             <table class="table table-hover">
                                 <tbody>
-                                <tr ng-repeat="d in vortoj() | limitTo: 8">
+                                <tr ng-repeat="(id, story) in stories | limitTo: 8">
                                     <td>
                                         <span class="btn btn-xs btn-block"
-                                              ng-style="{'background-color': chartColors[d], 'color': 'white'}">
-                                                <b>{{ d.count }}</b>
+                                              ng-style="{'background-color': chartColors[id],'color': 'white'}">
+                                            >{{ story.count }}</b>
                                         </span>
                                     </td>
-                                    <td> {{ d.SrcMAC }}</td>
+                                    <td>
+                                        <a ng-if="story.url" ng-href="{{ story.url }}" target="_blank"> {{ story.type }} </a>
+                                        <span ng-if="!story.url"> {{ story.type }} </span>
+                                    </td>
                                 </tr>
                             </table>
                         </div>
@@ -202,18 +205,23 @@
                         <caption>通信対象機器</caption>
                         <thead>
                         <tr>
-                            <th> 機器MAC</th>
+                            <th> 通信先</th>
                             <th> 回数</th>
-                            <th> 正常な応答回数</th>
-                            <th> 遮断</th>
+                            <th> 応答回数</th>
+                            <th> 送信回数</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr ng-repeat="d in directories | orderBy: '-deviceCount' | limitTo: 3">
-                            <td> {{ d.SrcMAC }}</td>
-                            <td> {{ d.SrcMAC }}</td>
-                            <td> {{ d.ACK }}</td>
-                            <td> {{ d.ACK }}</td>
+                        <tr ng-repeat="directory in directories |
+                               orderBy: '-deviceCount' | limitTo: 3">
+                            <td>
+                                <a ng-if="directory.url" ng-href="{{ directory.url }}"
+                                   target="_blank"> {{ directory.id }} </a>
+                                <span ng-if="!directory.url"> {{ directory.id }} </span>
+                            </td>
+                            <td> {{ directory.deviceCount }}</td>
+                            <td> {{ directory.filteredCount }}</td>
+                            <td> {{ directory.receiverCount }}</td>
                         </tr>
                         </tbody>
                     </table>
@@ -223,14 +231,17 @@
                         <tr>
                             <th> 機器MAC</th>
                             <th> 回数</th>
-                            <th> プロトコル</th>
+                            <th> 情報</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr ng-repeat="d in vortoj() | limitTo: 3">
-                            <td> {{ d.DeviceID }} </td>
-                            <td> {{ d.SYN }}</td>
-                            <td> {{ d.Protocol }} </a></td>
+                        <tr ng-repeat="device in devices |
+                               orderBy: '-event.rssi' | limitTo: 3">
+                            <td><a ng-href="{{ device.url }}"
+                                   target="_blank"> {{ device.event.deviceId }} </a></td>
+                            <td> {{ device.event.rssi }}</td>
+                            <td><a ng-href="{{ device.receiverUrl }}"
+                                   target="_blank"> {{ device.event.receiverId }} </a></td>
                         </tr>
                         </tbody>
                     </table>

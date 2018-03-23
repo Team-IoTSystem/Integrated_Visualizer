@@ -32,7 +32,7 @@ DEFAULT_BEAVER_OPTIONS = {
 
 /** Chart設定 */
 LINE_CHART_SAMPLES = 8;
-LINE_CHART_SERIES = ['デバイス', '不正通信'];
+LINE_CHART_SERIES = ['デバイス'];
 LINE_CHART_OPTIONS = {
     legend: {
         display: true,
@@ -190,7 +190,7 @@ angular.module('dashboard', ['chart.js', 'ui.bootstrap', 'beaver', 'cormorant'])
         $scope.rssi = {};
         $scope.stories = [];
         $scope.linechart = {
-            labels: [], series: LINE_CHART_SERIES, data: [[], []],
+            labels: [], series: LINE_CHART_SERIES, data: [[]],
             options: LINE_CHART_OPTIONS
         };
         $scope.barchart = {labels: BAR_CHART_LABELS, data: [], options: {}};
@@ -336,13 +336,9 @@ angular.module('dashboard', ['chart.js', 'ui.bootstrap', 'beaver', 'cormorant'])
                 x: $scope.elapsedSeconds,
                 y: $scope.devices.length
             });
-            $scope.linechart.data[1].push({
-                x: $scope.elapsedSeconds,
-                y: $scope.curStats.displacements
-            });
+
             if ($scope.linechart.data[0].length > LINE_CHART_SAMPLES) {
                 $scope.linechart.data[0].shift();
-                $scope.linechart.data[1].shift();
             }
         }
 
