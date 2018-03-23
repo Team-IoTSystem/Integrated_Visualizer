@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Angular JSON Get Sample</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.4/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-resource/1.6.9/angular-resource.min.js"></script>
+
+    <script>
+        /** API設定 */
+        VORTOJ_ROOT = 'https://localhost:3000';
+        SAMPLE_SOCKET_URL = VORTOJ_ROOT + '/sample/';
+        DEFAULT_VORTOJ_URL = VORTOJ_ROOT + '/api/packet/:id?id=';
+        RECENT_VORTOJ_URL = VORTOJ_ROOT + '/api/packet/new';
+
+        DEMO_GET_URL = './data/dummy_get.json';
+        DEMO_Q_URL = './data/dummy_query.json';
+
+        var module = angular.module('dashboard', ['ngResource']);
+
+        module.service('DashServ',function ($resource, $timeout, $q) {
+            this.vortoj = function(){
+                //return $resource(RECENT_VORTOJ_URL).get().$promise;
+                return $resource(DEMO_GET_URL).get().$promise;
+                //return $resource(DEMO_Q_URL).query().$promise;
+            };
+        });
+
+        module.controller('DashCtrl', function (DashServ, $scope) {
+
+            // Vortoj
+            var self = this;
+            self.masterdata = [];
+            DashServ.vortoj().then(function(ret){
+                self.masterdata["sechack"] = ret;
+                console.log(self.masterdata);
+            });
+
+            // 画面から呼び出し
+            $scope.vortoj = function(){
+                return self.masterdata["sechack"];
+            }})
+    </script>
+
+</head>
+
+<body ng-app="dashboard">
+
+<div class="container" ng-controller="DashCtrl">
+    <ul>
+        <li ng-repeat="d in vortoj()">{{d}}</li>
+    </ul>
+
+</div>
+</body>
+</html>

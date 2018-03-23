@@ -4,26 +4,29 @@
   "description": "test",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Team-IoTSystem/Visualize2D.git"
+    "url": "git+https://github.com/Team-IoTSystem/Integrated_Visualizer.git"
   },
   "author": "takuzoo3868",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Team-IoTSystem/Visualize2D/issues"
+    "url": "https://github.com/Team-IoTSystem/Integrated_Visualizer/issues"
   },
-  "homepage": "https://github.com/Team-IoTSystem/Visualize2D#readme",
+  "homepage": "https://github.com/Team-IoTSystem/Integrated_Visualizer#readme",
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-polyfill": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
-    "webpack": "^3.10.0"
+    "d3": "^4.13.0",
+    "oui": "^7.0.33",
+    "require": "^2.4.20",
+    "webpack": "^3.10.0",
+    "webpack-cli": "^2.0.12"
   },
-  "dependencies": {
-    "d3": "^4.12.0"
-  }
+  "dependencies": {}
 }
